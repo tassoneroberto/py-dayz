@@ -119,7 +119,7 @@ class CrackPasscode(object):
 
                     logging.info("Rotating the units disc 10 times...")
                     HoldKey(
-                        keys_mapping.w,
+                        keys_mapping.f,
                         self.ROTATION_TIME * 10,
                         self.COOLDOWN_TIME,
                     )
@@ -135,7 +135,7 @@ class CrackPasscode(object):
 
                     logging.info("Rotating the decimal disc 1 time...")
                     HoldKey(
-                        keys_mapping.w, self.ROTATION_TIME, self.COOLDOWN_TIME
+                        keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME
                     )
 
                     # update current
@@ -158,7 +158,7 @@ class CrackPasscode(object):
                     break
 
                 logging.info("Rotating the hundreds disc 1 time...")
-                HoldKey(keys_mapping.w, self.ROTATION_TIME, self.COOLDOWN_TIME)
+                HoldKey(keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME)
 
                 if self.check_stopped():
                     break
@@ -183,7 +183,7 @@ class CrackPasscode(object):
 
                         logging.info("Rotating the units disc 10 times...")
                         HoldKey(
-                            keys_mapping.w,
+                            keys_mapping.f,
                             self.ROTATION_TIME * 10,
                             self.COOLDOWN_TIME,
                         )
@@ -201,7 +201,7 @@ class CrackPasscode(object):
 
                         logging.info("Rotating the decimal disc 1 time...")
                         HoldKey(
-                            keys_mapping.w,
+                            keys_mapping.f,
                             self.ROTATION_TIME,
                             self.COOLDOWN_TIME,
                         )
@@ -231,7 +231,7 @@ class CrackPasscode(object):
 
                     logging.info("Rotating the hundreds disc 1 time...")
                     HoldKey(
-                        keys_mapping.w, self.ROTATION_TIME, self.COOLDOWN_TIME
+                        keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME
                     )
 
                     if self.check_stopped():
@@ -250,7 +250,7 @@ class CrackPasscode(object):
                     break
 
                 logging.info("Rotating the thousands disc 1 time...")
-                HoldKey(keys_mapping.w, self.ROTATION_TIME, self.COOLDOWN_TIME)
+                HoldKey(keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME)
 
                 if self.check_stopped():
                     break
@@ -280,7 +280,7 @@ class CrackPasscode(object):
 
     def switch_disc(self, times=1) -> None:
         for _ in range(times):
-            PressAndReleaseKey(keys_mapping.w, self.COOLDOWN_TIME)
+            PressAndReleaseKey(keys_mapping.f, self.COOLDOWN_TIME)
             if self.check_stopped():
                 return
 
