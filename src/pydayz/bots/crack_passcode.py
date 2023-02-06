@@ -33,9 +33,13 @@ class CrackPasscode(object):
 
     def init_args(self) -> None:
 
+        if not self.args.discs:
+            logging.error("Error: `discs` argument is required.")
+            exit()
+
         self.discs = self.args.discs
         if self.discs not in [3, 4]:
-            logging.error("Error: discs input has to be 3 or 4.")
+            logging.error("Error: `discs` argument has to be 3 or 4.")
             exit()
 
         if self.args.initial < 0:

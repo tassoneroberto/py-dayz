@@ -29,10 +29,12 @@ Bruteforce the 3 and 4 discs combination locks (vanilla only).
 
 It is recommended to set the game in window mode.
 
+Make sure the current moving disc is the last one (units digit).
+
 Note: Press `ESC` to interrupt the bot.
 
 ```powershell
-pydayz_crack_passcode
+pydayz_crack_passcode --discs 3
 ```
 
 Get the arguments list with the `help` function:
@@ -45,7 +47,11 @@ pydayz_crack_passcode --help
 
 The following table is listing all the arguments you can use:
 
-| arg           |  description      |
-|:-------------:|:-----------------:|
-| help          | Arguments description |
-| timeout       | Maximum time in seconds allowed |
+| arg           |  description      | Default |
+|:-------------:|:-----------------:|:-------:|
+| help          | Arguments description | `N/A` |
+| discs*        | Number of discs on the padlock [3, 4] | `None` |
+| initial       | Initial combination | `0000` |
+| timeout       | Maximum time in seconds allowed | `∞` |
+
+**Required*
