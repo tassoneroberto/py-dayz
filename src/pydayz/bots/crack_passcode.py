@@ -23,7 +23,8 @@ logging.root.setLevel(logging.INFO)
 
 class CrackPasscode(object):
 
-    ROTATION_TIME = 0.65
+    PRE_ROTATION_DELAY = 0.85
+    ROTATION_TIME = 0.55
     COOLDOWN_TIME = 0.6
 
     def __init__(self, args):
@@ -97,94 +98,95 @@ class CrackPasscode(object):
     def crack_brute(self) -> None:
         logging.info("Brute force attack started")
         logging.info(
-            f"Initial combination: {str(self.initial_combination).zfill(self.discs)}"
+            f"Initial combination: {self.format_combination(self.initial_combination)}"
         )
         logging.info(
             "Make sure the current moving disc is the last one (units digit)."
         )
 
-        if self.discs == 3:
-            self.crack_three_discs_padlock()
-        else:
-            self.crack_four_discs_padlock()
+        self.crack_padlock()
 
-    def crack_three_discs_padlock(self):
-        while not self.check_stopped():
-            for _ in range(10):
-                if self.check_stopped():
-                    break
-                for _ in range(10):
-                    if self.check_stopped():
-                        break
+        logging.info(
+            f"Last tried combination: {self.format_combination(self.current_combination)}."
+        )
+        logging.info(
+            f"Execute `pydayz_crack_passcode --discs {self.discs} --initial {self.current_combination}` to resume it."
+        )
 
-                    logging.info("Rotating the units disc 10 times...")
-                    HoldKey(
-                        keys_mapping.f,
-                        self.ROTATION_TIME * 10,
-                        self.COOLDOWN_TIME,
-                    )
+    def crack_padlock(self):
+        for _ in range(10 ** (self.discs - 1)):
+            if self.check_stopped():
+                break
 
-                    if self.check_stopped():
-                        break
+            self.show_progress()
 
-                    logging.info("Switching disc position to the tens digit")
-                    self.switch_disc(2)
+            logging.info("Rotating the units disc 9 times...")
+            HoldKey(
+                keys_mapping.f,
+                self.PRE_ROTATION_DELAY + self.ROTATION_TIME * 9,
+                self.COOLDOWN_TIME,
+            )
 
-                    if self.check_stopped():
-                        break
+            if self.check_stopped():
+                break
 
-                    logging.info("Rotating the decimal disc 1 time...")
-                    HoldKey(
-                        keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME
-                    )
+            logging.info("Switching disc position to the tens digit")
+            self.switch_disc(self.discs - 1)
 
-                    # update current
-                    self.current_combination += 10
-                    self.show_progress()
+            if self.check_stopped():
+                break
 
-                    if self.check_stopped():
-                        break
+            logging.info("Rotating the decimal disc 1 time...")
+            HoldKey(
+                keys_mapping.f,
+                self.PRE_ROTATION_DELAY + self.ROTATION_TIME,
+                self.COOLDOWN_TIME,
+            )
 
-                    logging.info("Switching disc position to the units digit")
-                    self.switch_disc(1)
+            self.current_combination += 10
 
-                if self.check_stopped():
-                    break
+            if self.check_stopped():
+                break
 
+            # check and increment the hundreds digit if tens digit is a 0
+            if (self.current_combination // 10) % 10 == 0:
                 logging.info("Switching disc position to the hundreds digit")
-                self.switch_disc(1)
+                self.switch_disc(self.discs - 1)
 
                 if self.check_stopped():
                     break
 
                 logging.info("Rotating the hundreds disc 1 time...")
-                HoldKey(keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME)
+                HoldKey(
+                    keys_mapping.f,
+                    self.PRE_ROTATION_DELAY + self.ROTATION_TIME,
+                    self.COOLDOWN_TIME,
+                )
+
+                if self.discs == 3 and self.current_combination >= 1000:
+                    self.current_combination -= 1000
 
                 if self.check_stopped():
                     break
 
-                logging.info("Switching disc position to the units digit")
-                self.switch_disc(2)
+                if self.discs == 4:
+                    # check and increment the thousands digit if hundreds digit is a 0
+                    if (self.current_combination // 100) % 10 == 0:
+                        logging.info(
+                            "Switching disc position to the thousands digit"
+                        )
+                        self.switch_disc(self.discs - 1)
 
-                if self.check_stopped():
-                    break
+                        if self.current_combination >= 10000:
+                            self.current_combination -= 10000
 
-    def crack_four_discs_padlock(self):
-        while not self.check_stopped():
-            for _ in range(10):
-                if self.check_stopped():
-                    break
-                for _ in range(10):
-                    if self.check_stopped():
-                        break
-                    for _ in range(10):
                         if self.check_stopped():
                             break
 
-                        logging.info("Rotating the units disc 10 times...")
+                        logging.info("Rotating the thousands disc 1 time...")
                         HoldKey(
                             keys_mapping.f,
-                            self.ROTATION_TIME * 10,
+                            self.PRE_ROTATION_DELAY + self.ROTATION_TIME,
                             self.COOLDOWN_TIME,
                         )
 
@@ -192,95 +194,51 @@ class CrackPasscode(object):
                             break
 
                         logging.info(
-                            "Switching disc position to the tens digit"
-                        )
-                        self.switch_disc(3)
-
-                        if self.check_stopped():
-                            break
-
-                        logging.info("Rotating the decimal disc 1 time...")
-                        HoldKey(
-                            keys_mapping.f,
-                            self.ROTATION_TIME,
-                            self.COOLDOWN_TIME,
-                        )
-
-                        # update current
-                        self.current_combination += 10
-                        self.show_progress()
-
-                        if self.check_stopped():
-                            break
-
-                        logging.info(
-                            "Switching disc position to the units digit"
+                            "Switching disc position to the hundreds digit"
                         )
                         self.switch_disc(1)
 
-                        if self.check_stopped():
-                            break
-
-                    logging.info(
-                        "Switching disc position to the hundreds digit"
-                    )
-                    self.switch_disc(2)
-
-                    if self.check_stopped():
-                        break
-
-                    logging.info("Rotating the hundreds disc 1 time...")
-                    HoldKey(
-                        keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME
-                    )
-
-                    if self.check_stopped():
-                        break
-
-                    logging.info("Switching disc position to the units digit")
-                    self.switch_disc(2)
-
-                    if self.check_stopped():
-                        break
-
-                logging.info("Switching disc position to the thousands digit")
+                logging.info("Switching disc position to the tens digit")
                 self.switch_disc(1)
 
-                if self.check_stopped():
-                    break
-
-                logging.info("Rotating the thousands disc 1 time...")
-                HoldKey(keys_mapping.f, self.ROTATION_TIME, self.COOLDOWN_TIME)
-
-                if self.check_stopped():
-                    break
-
-                logging.info("Switching disc position to the units digit")
-                self.switch_disc(2)
-
-                if self.check_stopped():
-                    break
+            logging.info("Switching disc position to the units digit")
+            self.switch_disc(1)
 
     def show_progress(self) -> None:
         elapsed_seconds = time.time() - self.start_time
-        eta_seconds = (
-            elapsed_seconds
-            / abs(self.current_combination - self.initial_combination)
-        ) * (10**self.discs)
+        total_combinations = 10**self.discs
+        guessed_combinations = (
+            self.current_combination - self.initial_combination
+            if self.current_combination > self.initial_combination
+            else total_combinations
+            - self.initial_combination
+            + self.current_combination
+        )
+        eta_seconds = (total_combinations - guessed_combinations) * (
+            elapsed_seconds / guessed_combinations
+        )
+
         logging.info(
-            f"Current combination: {str(self.current_combination).zfill(self.discs)}"
+            f"Current combination: {self.format_combination(self.current_combination)}"
         )
         logging.info(
             f"Elapsed time: {str(timedelta(seconds=elapsed_seconds))}"
         )
-        logging.info(f"ETA: {str(timedelta(seconds=eta_seconds))}")
+        logging.info(
+            f"ETA: {str(timedelta(seconds=eta_seconds))} | {round((guessed_combinations / total_combinations)*100,2)}%"
+        )
+
+    def format_combination(self, combination) -> str:
+        return (
+            "[" + " ".join(str(combination).zfill(self.discs)[:-1] + "X") + "]"
+        )
 
     def cooldown(self, seconds=COOLDOWN_TIME) -> None:
         time.sleep(seconds)
 
     def switch_disc(self, times=1) -> None:
         for _ in range(times):
-            PressAndReleaseKey(keys_mapping.f, self.COOLDOWN_TIME)
+            PressAndReleaseKey(keys_mapping.f, cooldown=0.2)
             if self.check_stopped():
                 return
 
