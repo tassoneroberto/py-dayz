@@ -52,6 +52,11 @@ The following table is listing all the arguments you can use:
 | help          | Arguments description | `N/A` |
 | discs*        | Number of discs on the padlock [3, 4] | `None` |
 | initial       | Initial combination | `0000` |
-| timeout       | Maximum time in seconds allowed | `∞` |
+| speed**       | Rotation speed (ms) | `550` |
+| timeout       | Maximum time allowed (seconds) | `∞` |
 
 **Required*
+
+***Depends on the soft skills bar*
+
+![softskills](preview/soft-skills.png)

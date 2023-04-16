@@ -23,9 +23,8 @@ logging.root.setLevel(logging.INFO)
 
 class CrackPasscode(object):
 
-    PRE_ROTATION_DELAY = 0.85
-    ROTATION_TIME = 0.55
-    COOLDOWN_TIME = 0.6
+    PRE_ROTATION_DELAY = 850 # time in ms
+    COOLDOWN_TIME = 600 # time in ms
 
     def __init__(self, args):
         self.stopped = False
@@ -60,6 +59,8 @@ class CrackPasscode(object):
                 "Error: initial combination too big for 4-discs padlock. Range: [0, 9999]"
             )
             exit()
+
+        self.rotation_speed = self.args.speed
 
         self.initial_combination = self.args.initial
         self.current_combination = self.initial_combination
@@ -123,7 +124,7 @@ class CrackPasscode(object):
             logging.info("Rotating the units disc 9 times...")
             HoldKey(
                 keys_mapping.f,
-                self.PRE_ROTATION_DELAY + self.ROTATION_TIME * 9,
+                self.PRE_ROTATION_DELAY + self.rotation_speed * 9,
                 self.COOLDOWN_TIME,
             )
 
@@ -139,7 +140,7 @@ class CrackPasscode(object):
             logging.info("Rotating the decimal disc 1 time...")
             HoldKey(
                 keys_mapping.f,
-                self.PRE_ROTATION_DELAY + self.ROTATION_TIME,
+                self.PRE_ROTATION_DELAY + self.rotation_speed,
                 self.COOLDOWN_TIME,
             )
 
@@ -159,7 +160,7 @@ class CrackPasscode(object):
                 logging.info("Rotating the hundreds disc 1 time...")
                 HoldKey(
                     keys_mapping.f,
-                    self.PRE_ROTATION_DELAY + self.ROTATION_TIME,
+                    self.PRE_ROTATION_DELAY + self.rotation_speed,
                     self.COOLDOWN_TIME,
                 )
 
@@ -186,7 +187,7 @@ class CrackPasscode(object):
                         logging.info("Rotating the thousands disc 1 time...")
                         HoldKey(
                             keys_mapping.f,
-                            self.PRE_ROTATION_DELAY + self.ROTATION_TIME,
+                            self.PRE_ROTATION_DELAY + self.rotation_speed,
                             self.COOLDOWN_TIME,
                         )
 
@@ -233,12 +234,12 @@ class CrackPasscode(object):
             "[" + " ".join(str(combination).zfill(self.discs)[:-1] + "X") + "]"
         )
 
-    def cooldown(self, seconds=COOLDOWN_TIME) -> None:
-        time.sleep(seconds)
+    def cooldown(self, ms=COOLDOWN_TIME) -> None:
+        time.sleep(ms / 1000)
 
     def switch_disc(self, times=1) -> None:
         for _ in range(times):
-            PressAndReleaseKey(keys_mapping.f, cooldown=0.2)
+            PressAndReleaseKey(keys_mapping.f, cooldown=200)
             if self.check_stopped():
                 return
 
@@ -262,7 +263,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--discs",
         default=None,
-        help="Number of padlock discs. Allowed are: [3, 4]",
+        help="Number of padlock discs. Allowed values: [3, 4]",
         type=int,
     )
     parser.add_argument(
@@ -272,9 +273,15 @@ def get_argument_parser() -> argparse.ArgumentParser:
         type=int,
     )
     parser.add_argument(
+        "--speed",
+        default=500,
+        help="Rotation speed (in milliseconds)",
+        type=int,
+    )
+    parser.add_argument(
         "--timeout",
         default=None,
-        help="Maximum time (in seconds) allowed to the script to run",
+        help="Maximum time allowed to the script to run (in seconds)",
         type=int,
     )
 
