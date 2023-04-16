@@ -15,7 +15,7 @@ git clone --recurse-submodules git@github.com:tassoneroberto/py-dayz.git
 cd pydayz
 py -3.10 -m venv venv
 .\venv\Scripts\Activate.ps1
-py -m pip install iocontroller
+py -m pip install .\iocontroller
 py -m pip install .
 ```
 
