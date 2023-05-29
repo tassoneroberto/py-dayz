@@ -23,7 +23,9 @@ py -m pip install .
 
 Bruteforce the 3 and 4 discs combination locks (vanilla only).
 
-![detection](preview/combination_lock_green.png)
+![detection](preview/combination_lock_three_discs.png)
+
+![detection](preview/combination_lock_four_discs.png)
 
 ### Usage
 
